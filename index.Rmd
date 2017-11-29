@@ -1,0 +1,20 @@
+---
+title: "our stor 320 final project"
+---
+
+
+***
+
+**about the site**
+
+We made this site to showcase the results of our final project data analysis. We analyzed traffic stop data in Charlotte, NC, and we got our dataset [here](https://catalog.data.gov/dataset/officer-traffic-stops-b95e4). 
+
+
+***
+
+**about us**
+
+![*Wyatt Wilt*](/users/azechel/Documents/GitHub/banannaclaire.github.io/Wyatt.jpg)    ![*Anna Zechel*](/users/azechel/Documents/GitHub/banannaclaire.github.io/Anna.jpeg)    ![*Hunter Lamb*](/users/azechel/Documents/GitHub/banannaclaire.github.io/Hunter.jpg)
+
+
+Meet the group members: seniors Wyatt, Anna, and Hunter. Wyatt is from Winston-Salem, NC, studying Statistics & Analytics. She's currently a graphic design editor for Coulture, a magazine on campus, and is an all-around boss b*tch. Anna is from Chicago, IL, and pursuing dual majors in ST/AN and Business Administration. She somehow stumbled into full-time employment so she doesn't like to leave her couch, but she did just get a puppy (who has been to class, hopefully unnoticed). Hunter is from Greensboro, NC, also studying ST/AN, and is a mentor for UNC FEMMES on campus. Hunter is also somehow employed. We hope you enjoy our work. 

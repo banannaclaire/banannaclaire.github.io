@@ -1,8 +1,34 @@
 name: "group-24"
 navbar:
-  title: "G24: Data Analysis"
+  title: "group24"
   left:
-    - text: "Home"
+    - text: "home"
+      icon: fa-home
       href: index.html
-    - text: "About"
-      href: about.html
+    - text: "overview"
+      icon: fa-align-center
+      href: overview.html
+    - text: "questions"
+      icon: fa-question-circle
+      href: initials.html
+    - text: "exploration"
+      icon: fa-cogs
+      href: exploration.html
+    - text: "analysis"
+      icon: fa-area-chart
+      href: analysis.html
+    - text: "blog"
+      icon: fa-quote-left
+      href: results.html
+    - text: "presentation"
+      icon: fa-list-alt
+      href: slides.html
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+    exclude:
+      after_body: footer.html
+    css: styles.css
+
+output_dir: "."
