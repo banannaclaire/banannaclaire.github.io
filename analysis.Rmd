@@ -2,4 +2,9 @@
 title: "our final analysis"
 ---
 
-This site is currently in progress. Check back Friday!
+This site is currently in progress. Here's what we have so far:
+
+```{r, child='_everything.rmd'}
+
+```
+
