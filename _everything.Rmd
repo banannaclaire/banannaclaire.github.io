@@ -1,0 +1,87 @@
+---
+title: "hidden analysis"
+author: "Anna Zechel"
+date: "11/29/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(modelr)
+```
+
+*load stuff from last time*
+```{r}
+OTS_clean <-read.csv("OTS_clean.csv")
+
+#Reason
+p_reason_search <- summarise(group_by(OTS_clean, search, reason), total=n()) %>% filter(search == "Yes")
+p_reason_stop <- summarise(group_by(OTS_clean, search, reason), total=n()) %>% filter(search == "No")
+p_reason <- inner_join(p_reason_search, p_reason_stop, by="reason")
+p_reason <- select(ungroup(p_reason), reason, search = total.x, nosearch = total.y)
+p_reason <- mutate(p_reason, ratstopsearch = search / (search + nosearch))
+totalstops <- nrow(OTS_clean)
+p_reason <- mutate(p_reason, pstoptotal = (search + nosearch) / totalstops)
+totalsearches <- nrow(filter(OTS_clean, search == "Yes"))
+p_reason <- mutate(p_reason, psearchtotal = search / totalsearches)
+p_reason
+
+#Division
+psearch <- summarise(group_by(OTS_clean, search, division), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, division), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="division")
+p <- select(ungroup(p), division, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_division <- p
+p_division
+
+#Officer Race
+psearch <- summarise(group_by(OTS_clean, search, orace), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, orace), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="orace")
+p <- select(ungroup(p), orace, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_orace <- p
+p_orace
+
+#Officer Gender
+psearch <- summarise(group_by(OTS_clean, search, ogender), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, ogender), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="ogender")
+p <- select(ungroup(p), ogender, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_ogender <- p
+p_ogender
+
+#Driver Race
+psearch <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="drace")
+p <- select(ungroup(p), drace, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_drace <- p
+p_drace
+
+#Driver Ethnicity
+psearch <- summarise(group_by(OTS_clean, search, dethnicity), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, dethnicity), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="dethnicity")
+p <- select(ungroup(p), dethnicity, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_dethnicity <- p
+p_dethnicity
+
+#Driver Gender
+psearch <- summarise(group_by(OTS_clean, search, dgender), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, dgender), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="dgender")
+p <- select(ungroup(p), dgender, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_dgender <- p
+p_dgender
+```
+
+
+```
+
