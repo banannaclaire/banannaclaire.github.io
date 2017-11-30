@@ -18,7 +18,7 @@ pop_race <- read_csv("pop_race.csv")
 totalstops <- nrow(OTS_clean)
 totalsearches <- nrow(filter(OTS_clean, search == "Yes"))
 
-#Driver Race
+#Driver Race proportions
 psearch <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "Yes")
 pstop <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "No")
 p <- inner_join(psearch, pstop, by="drace")
@@ -29,4 +29,50 @@ p_drace
 
 ```
 
-In our exploratory analysis, the t-test showed that the difference between the black population proportion and the proportion of black stopped drivers was significant. We want to run this test on the other values of race to see whether or not 
+In our exploratory analysis, the t-test showed that the difference between the black population proportion and the proportion of black stopped drivers was significant. We want to run this test on the other values of race to see if those proportions are also significantly different from the population proportion. We'll use prop.test again, but this time we cleaned up the set formerly labeled Charlotte_race_data (now pop_race). 
+
+```{r}
+totalblack <- nrow(filter(OTS_clean, drace == "Black"))
+totalwhite <- nrow(filter(OTS_clean, drace == "White"))
+totalasian <- nrow(filter(OTS_clean, drace == "Asian"))
+totalother <- nrow(filter(OTS_clean, drace == "Other/Unknown")) 
+
+#Significance test for Black
+prop.test(c(totalblack, pop_race$Black[[1]]), c(totalstops, pop_race$Black[[2]]))
+
+#Significance test for White
+prop.test(c(totalwhite, pop_race$White[[1]]), c(totalstops, pop_race$White[[2]]))
+
+#Significance test for Asian
+prop.test(c(totalasian, pop_race$Asian[[1]]), c(totalstops, pop_race$Asian[[2]]))
+
+#Significance test for Other
+prop.test(c(totalother, pop_race$Other[[1]]), c(totalstops, pop_race$Other[[2]]))
+
+```
+
+According to the results of our t-tests, the difference between the proportions of each race getting stopped and the proportion of each race in the population is significant. We saw from p_drace that Black drivers are 55% of those stopped and 88% of those searched, which seems pretty significant just intuitively. We'd like to go further and examine the significance of the difference in rates of stop v. rates of search for each of the races. 
+
+This won't require the Charlotte population data because we're doing a paired test using just our OTS_clean data. 
+
+```{r}
+#Black
+prop.test(c(p_drace$search[[2]], totalblack), c(totalsearches, nrow(OTS_clean)))
+
+#White
+prop.test(c(p_drace$search[[4]], totalwhite), c(totalsearches, nrow(OTS_clean)))
+
+#Asian
+prop.test(c(p_drace$search[[1]], totalasian), c(totalsearches, nrow(OTS_clean)))
+
+#Other
+prop.test(c(p_drace$search[[3]], totalother), c(totalsearches, nrow(OTS_clean)))
+
+```
+
+Once again, our results indicate that the difference in stop to search ratios is significant; this reinforces our overarching goal from the EDA to examine the influence of race on likelihood of search. We decided to use the KNN classification method to model this relationship. First we need a train and test dataset. 
+
+```{r}
+
+```
+

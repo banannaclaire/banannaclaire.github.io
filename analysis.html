@@ -272,26 +272,127 @@ $(document).ready(function () {
 
 
 <p>This site is currently in progress. Here’s what we have so far:</p>
-<p><em>playing with the results of our exploratory analysis</em></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">OTS_clean &lt;-<span class="kw">read.csv</span>(<span class="st">&quot;OTS_clean.csv&quot;</span>)
-totalstops &lt;-<span class="st"> </span><span class="kw">nrow</span>(OTS_clean)
-totalsearches &lt;-<span class="st"> </span><span class="kw">nrow</span>(<span class="kw">filter</span>(OTS_clean, search <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>))
+<p>In our exploratory analysis, the t-test showed that the difference between the black population proportion and the proportion of black stopped drivers was significant. We want to run this test on the other values of race to see if those proportions are also significantly different from the population proportion. We’ll use prop.test again, but this time we cleaned up the set formerly labeled Charlotte_race_data (now pop_race).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">totalblack &lt;-<span class="st"> </span><span class="kw">nrow</span>(<span class="kw">filter</span>(OTS_clean, drace <span class="op">==</span><span class="st"> &quot;Black&quot;</span>))
+totalwhite &lt;-<span class="st"> </span><span class="kw">nrow</span>(<span class="kw">filter</span>(OTS_clean, drace <span class="op">==</span><span class="st"> &quot;White&quot;</span>))
+totalasian &lt;-<span class="st"> </span><span class="kw">nrow</span>(<span class="kw">filter</span>(OTS_clean, drace <span class="op">==</span><span class="st"> &quot;Asian&quot;</span>))
+totalother &lt;-<span class="st"> </span><span class="kw">nrow</span>(<span class="kw">filter</span>(OTS_clean, drace <span class="op">==</span><span class="st"> &quot;Other/Unknown&quot;</span>)) 
 
-<span class="co">#Driver Race</span>
-psearch &lt;-<span class="st"> </span><span class="kw">summarise</span>(<span class="kw">group_by</span>(OTS_clean, search, drace), <span class="dt">total=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(search <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>)
-pstop &lt;-<span class="st"> </span><span class="kw">summarise</span>(<span class="kw">group_by</span>(OTS_clean, search, drace), <span class="dt">total=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(search <span class="op">==</span><span class="st"> &quot;No&quot;</span>)
-p &lt;-<span class="st"> </span><span class="kw">inner_join</span>(psearch, pstop, <span class="dt">by=</span><span class="st">&quot;drace&quot;</span>)
-p &lt;-<span class="st"> </span><span class="kw">select</span>(<span class="kw">ungroup</span>(p), drace, <span class="dt">search =</span> total.x, <span class="dt">nosearch =</span> total.y)
-p &lt;-<span class="st"> </span><span class="kw">mutate</span>(p, <span class="dt">ratstopsearch =</span> search <span class="op">/</span><span class="st"> </span>(search <span class="op">+</span><span class="st"> </span>nosearch), <span class="dt">pstoptotal =</span> (search <span class="op">+</span><span class="st"> </span>nosearch) <span class="op">/</span><span class="st"> </span>totalstops, <span class="dt">psearchtotal =</span> search <span class="op">/</span><span class="st"> </span>totalsearches)
-p_drace &lt;-<span class="st"> </span>p
-p_drace</code></pre></div>
-<pre><code>## # A tibble: 4 x 6
-##           drace search nosearch ratstopsearch pstoptotal psearchtotal
-##          &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
-## 1         Asian     29     1900    0.01503370 0.01792351  0.006195257
-## 2         Black   3667    56010    0.06144746 0.55449528  0.783379620
-## 3 Other/Unknown     38     3247    0.01156773 0.03052293  0.008117924
-## 4         White    947    41704    0.02220347 0.39629637  0.202307199</code></pre>
+<span class="co">#Significance test for Black</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(totalblack, pop_race<span class="op">$</span>Black[[<span class="dv">1</span>]]), <span class="kw">c</span>(totalstops, pop_race<span class="op">$</span>Black[[<span class="dv">2</span>]]))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(totalblack, pop_race$Black[[1]]) out of c(totalstops, pop_race$Black[[2]])
+## X-squared = 4092.1, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  0.1003291 0.1066615
+## sample estimates:
+##    prop 1    prop 2 
+## 0.5544953 0.4510000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Significance test for White</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(totalwhite, pop_race<span class="op">$</span>White[[<span class="dv">1</span>]]), <span class="kw">c</span>(totalstops, pop_race<span class="op">$</span>White[[<span class="dv">2</span>]]))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(totalwhite, pop_race$White[[1]]) out of c(totalstops, pop_race$White[[2]])
+## X-squared = 888.58, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  0.04318974 0.04940299
+## sample estimates:
+##    prop 1    prop 2 
+## 0.3962964 0.3500000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Significance test for Asian</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(totalasian, pop_race<span class="op">$</span>Asian[[<span class="dv">1</span>]]), <span class="kw">c</span>(totalstops, pop_race<span class="op">$</span>Asian[[<span class="dv">2</span>]]))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(totalasian, pop_race$Asian[[1]]) out of c(totalstops, pop_race$Asian[[2]])
+## X-squared = 2215.8, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.03300564 -0.03114734
+## sample estimates:
+##     prop 1     prop 2 
+## 0.01792351 0.05000000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Significance test for Other</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(totalother, pop_race<span class="op">$</span>Other[[<span class="dv">1</span>]]), <span class="kw">c</span>(totalstops, pop_race<span class="op">$</span>Other[[<span class="dv">2</span>]]))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(totalother, pop_race$Other[[1]]) out of c(totalstops, pop_race$Other[[2]])
+## X-squared = 11411, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.1197698 -0.1171843
+## sample estimates:
+##     prop 1     prop 2 
+## 0.03052293 0.14900000</code></pre>
+<p>According to the results of our t-tests, the difference between the proportions of each race getting stopped and the proportion of each race in the population is significant. We saw from p_drace that Black drivers are 55% of those stopped and 88% of those searched, which seems pretty significant just intuitively. We’d like to go further and examine the significance of the difference in rates of stop v. rates of search for each of the races.</p>
+<p>This won’t require the Charlotte population data because we’re doing a paired test using just our OTS_clean data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Black</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(p_drace<span class="op">$</span>search[[<span class="dv">2</span>]], totalblack), <span class="kw">c</span>(totalsearches, <span class="kw">nrow</span>(OTS_clean)))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(p_drace$search[[2]], totalblack) out of c(totalsearches, nrow(OTS_clean))
+## X-squared = 954.77, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  0.2166041 0.2411645
+## sample estimates:
+##    prop 1    prop 2 
+## 0.7833796 0.5544953</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#White</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(p_drace<span class="op">$</span>search[[<span class="dv">4</span>]], totalwhite), <span class="kw">c</span>(totalsearches, <span class="kw">nrow</span>(OTS_clean)))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(p_drace$search[[4]], totalwhite) out of c(totalsearches, nrow(OTS_clean))
+## X-squared = 709.96, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.2059739 -0.1820044
+## sample estimates:
+##    prop 1    prop 2 
+## 0.2023072 0.3962964</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Asian</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(p_drace<span class="op">$</span>search[[<span class="dv">1</span>]], totalasian), <span class="kw">c</span>(totalsearches, <span class="kw">nrow</span>(OTS_clean)))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(p_drace$search[[1]], totalasian) out of c(totalsearches, nrow(OTS_clean))
+## X-squared = 35.338, df = 1, p-value = 2.771e-09
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.014223182 -0.009233326
+## sample estimates:
+##      prop 1      prop 2 
+## 0.006195257 0.017923511</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Other</span>
+<span class="kw">prop.test</span>(<span class="kw">c</span>(p_drace<span class="op">$</span>search[[<span class="dv">3</span>]], totalother), <span class="kw">c</span>(totalsearches, <span class="kw">nrow</span>(OTS_clean)))</code></pre></div>
+<pre><code>## 
+##  2-sample test for equality of proportions with continuity
+##  correction
+## 
+## data:  c(p_drace$search[[3]], totalother) out of c(totalsearches, nrow(OTS_clean))
+## X-squared = 77.646, df = 1, p-value &lt; 2.2e-16
+## alternative hypothesis: two.sided
+## 95 percent confidence interval:
+##  -0.02528488 -0.01952514
+## sample estimates:
+##      prop 1      prop 2 
+## 0.008117924 0.030522932</code></pre>
+<p>Once again, our results indicate that the difference in stop to search ratios is significant; this reinforces our overarching goal from the EDA to examine the influence of race on likelihood of search. We decided to use the KNN classification method to model this relationship. First we need a train and test dataset.</p>
 
 
 
