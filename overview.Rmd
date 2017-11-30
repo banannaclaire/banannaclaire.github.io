@@ -2,4 +2,4 @@
 title: "overview & our motivations"
 ---
 
-This site is currently in progress. Check back Friday!
+This page is currently in progress. Check back Friday!
