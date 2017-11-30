@@ -11,9 +11,10 @@ library(tidyverse)
 library(modelr)
 ```
 
-*playing with the results of our exploratory analysis*
-```{r}
+```{r, include=FALSE}
 OTS_clean <-read.csv("OTS_clean.csv")
+pop_race <- read_csv("pop_race.csv")
+
 totalstops <- nrow(OTS_clean)
 totalsearches <- nrow(filter(OTS_clean, search == "Yes"))
 
@@ -26,6 +27,6 @@ p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (searc
 p_drace <- p
 p_drace
 
-
 ```
 
+In our exploratory analysis, the t-test showed that the difference between the black population proportion and the proportion of black stopped drivers was significant. We want to run this test on the other values of race to see whether or not 
