@@ -9,6 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(modelr)
+library(mvtnorm)
+library(flexclust)
+library(class)
+source('helper_functions.R')
+source('md_helper_functions.R')
 ```
 
 ```{r, include=FALSE}
@@ -70,9 +75,209 @@ prop.test(c(p_drace$search[[3]], totalother), c(totalsearches, nrow(OTS_clean)))
 
 ```
 
-Once again, our results indicate that the difference in stop to search ratios is significant; this reinforces our overarching goal from the EDA to examine the influence of race on likelihood of search. We decided to use the KNN classification method to model this relationship. First we need a train and test dataset. 
+Once again, our results indicate that the difference in stop to search ratios is significant; this reinforces our overarching goal from the EDA to examine the influence of race on likelihood of search. We decided to try the Nearest Centroid classification method used in class to model this relationship.
+
+*Nearest Centroid Method*
+```{r}
+OTS_race <- select(OTS_clean, x1 = dage, x2 = drace, y = search)
+
+OTS_race$y <- as.factor((OTS_race$y=='No')*(-1) + (OTS_race$y=='Yes')*(1) )
+
+racekey <- as.tibble(levels(OTS_clean$drace))
+
+racekey <- add_column(racekey, label = 0:4)
+
+OTS_race$x2 <- as.factor((OTS_race$x2=='Asian')*(0) + (OTS_race$x2=='Black')*(1) + (OTS_race$x2=='Native American')*(2) + (OTS_race$x2=='Other/Unknown')*(3) + (OTS_race$x2=='White')*(4))
+
+k <- 4
+OTS_race$x2 <- as.numeric(OTS_race$x2)
+
+```
+
+```{r}
+data_gauss <- OTS_race
+
+ggplot(data=data_gauss) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y))+
+    theme(panel.background = element_blank()) 
+```
+
+```{r}
+x_test <- c(20, 0)
+
+ggplot(data=data_gauss) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y)) + 
+    geom_point(aes(x=x_test[1], y=x_test[2]), shape='X', size=10) + 
+    theme(panel.background = element_blank())
+
+
+obs_means <- OTS_race %>% 
+    group_by(y) %>% 
+    summarise_all(mean)
+
+obs_means
+```
 
 ```{r}
 
+ggplot(data=OTS_race) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y), alpha=.3) +  #train points
+    geom_point(aes(x=x_test[1], y=x_test[2]), shape='X', size=10) + # test point
+    geom_point(data=obs_means, aes(x=x1, y=x2, color=y), shape='X', size=10) +
+    theme(panel.background = element_blank())
+
+mean_pos <- select(filter(obs_means, y==1), -y)
+mean_neg <- select(filter(obs_means, y==-1), -y)
+
+dist_pos <- sqrt(sum((x_test - mean_pos)^2))
+dist_neg <- sqrt(sum((x_test - mean_neg)^2))
+dist_pos
+dist_neg
+
+
 ```
+
+```{r}
+ggplot(data=OTS_race) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y), alpha=.3) +  # train points
+    geom_point(aes(x=x_test[1], y=x_test[2]), shape='X', size=10) + # test point
+    geom_point(data=obs_means, aes(x=x1, y=x2, color=y), shape='X', size=10) + # class means
+    geom_segment(aes(x = x_test[1], y = x_test[2], xend = mean_pos[1], yend = mean_pos[2])) +  
+    geom_segment(aes(x = x_test[1], y = x_test[2], xend = mean_neg[1], yend = mean_neg[2])) + 
+    theme(panel.background = element_blank())
+
+test_grid <- expand.grid(x1 = seq(0, 70, length = 100),
+                         x2 = seq(0, k, length = 100)) %>% 
+            as_tibble()
+
+dist_pos <- apply(test_grid, 1, function(x) sqrt(sum((x - mean_pos)^2)))
+dist_neg <- apply(test_grid, 1, function(x) sqrt(sum((x - mean_neg)^2)))
+
+test_grid <- test_grid %>% 
+    add_column(dist_pos = dist_pos,
+               dist_neg = dist_neg)
+
+test_grid <- test_grid %>% 
+             mutate(y_pred = ifelse(dist_pos < dist_neg, 1, -1)) %>% 
+             mutate(y_pred=factor(y_pred))
+
+```
+
+```{r}
+ggplot() +
+   geom_point(data=OTS_race, aes(x=OTS_race$x1, y=OTS_race$x2, color=OTS_race$y, shape=OTS_race$y), alpha=1) +  # train points
+   geom_point(data=test_grid, aes(x=x1, y=x2, color=y_pred), alpha=.1) + # test points
+   xlim(0, 70) + # axis limits
+   ylim(0, k) +
+   theme(panel.background = element_blank())
+
+mean_pos <- mean_pos %>% as.matrix() %>% t()
+mean_neg <- mean_neg %>% as.matrix() %>% t()
+normal_vector <- mean_pos - mean_neg
+intercept  <- -(1/2)*( t(mean_pos) %*% mean_pos - t(mean_neg) %*% mean_neg )
+
+plot_md_predictions(OTS_race, title='Driver Race Data')
+
+err <- get_nearest_centroid_predictions(OTS_race, OTS_race) %>% 
+    summarise(error_rate = mean(y != y_pred))
+
+view_err <- get_nearest_centroid_predictions(OTS_race, OTS_race)
+head(view_err$y)
+view_err$y_pred
+as.integer(view_err$y)-as.integer(view_err$y_pred)
+
+print("error rate for nearest centroid = ")
+err
+
+```
+
+*KNN Method*
+```{r}
+k <- 5 
+x_test <- c(35, 1)
+
+ggplot(data=data_gauss) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y)) + 
+    geom_point(aes(x=x_test[1], y=x_test[2]), shape='X', size=10) + 
+    theme(panel.background = element_blank())
+
+train_data <- data_gauss
+
+distances <- train_data %>%
+         select(-y) %>%
+        dist2(x_test) %>% 
+        c() 
+
+distances[0:5]   
+
+train_data_sorted <- train_data %>% 
+        add_column(dist2tst = distances) %>% 
+        arrange(dist2tst) 
+head(train_data_sorted)
+
+nearest_neighbhors <- slice(train_data_sorted, 1:k) 
+nearest_neighbhors
+
+ggplot(data=data_gauss) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y), alpha=.2) + 
+    geom_point(aes(x=x_test[1], y=x_test[2]), shape='X', size=6) + 
+    geom_point(data=nearest_neighbhors, aes(x=x1, y=x2, color=y, shape=y), size=2) +
+    theme(panel.background = element_blank())
+
+votes <- nearest_neighbhors %>% 
+         group_by(y) %>% 
+         summarise(votes=n())
+
+votes
+
+y_pred <- filter(votes, votes == max(votes))$y[1]
+y_pred
+
+test_df <- tibble(x1=x_test[1], x2=x_test[2], y=y_pred)
+
+ggplot(data=data_gauss) + 
+    geom_point(aes(x=x1, y=x2, color=y, shape=y), alpha=.2) + 
+     geom_point(data=test_df, aes(x=x1, y=x2, color=y, shape=y), shape="X", size=6) + 
+    geom_point(data=nearest_neighbhors, aes(x=x1, y=x2, color=y, shape=y), size=2) +
+    theme(panel.background = element_blank())
+```
+
+While these plots are informative to some extent, our end goal is still to build an easy to use model. We believe this is best accomplished using logistic regression.
+
+*Logistic Regression Model*
+
+```{r}
+#First we want to put our headers back, and change search to a [0, 1] binary
+
+#OTS_race <- select(OTS_clean, Age = x1, Race = x2, Search = y)
+OTS_race$y <- as.factor((OTS_race$y=='No')*(0) + (OTS_race$y=='Yes')*(1) )
+
+train <- OTS_race[1:96861,]
+test <- OTS_race[96862:107624,]
+
+model <- glm(y ~.,family=binomial(link='logit'),data=train)
+
+summary(model)
+```
+
+*Evaluating the fitting of the model*
+```{r}
+anova(model, test="Chisq")
+library(pscl)
+pR2(model)
+```
+
+The difference between the null deviance and the residual deviance shows how our model is doing against the null model. We also found code online for a McFadden R^[2].
+
+*Testing the model*
+
+```{r}
+fitted.results <- predict(model,newdata=subset(test,select=c(1,2)),type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+
+misClasificError <- mean(fitted.results != test$y)
+print(paste('Accuracy',1-misClasificError))
+```
+
+In the Results tab, we compare the results of our analysis to others' research.
 

@@ -2,4 +2,148 @@
 title: "our exploratory analysis"
 ---
 
-This site is currently in progress. Check back Friday!
+```{r, include=FALSE}
+library(tidyverse)
+
+OTS_clean <-read.csv("OTS_clean.csv")
+```
+
+
+We started by trying to visualize the relationships between different demographic variables and the categorical search variable
+
+-Location of search
+
+-Driver Race
+
+-Driver Gender
+
+-Officer Race
+
+-Officer Gender
+
+These plots didn’t tell us much. We needed to adjust for the proportion of total stops that certain categories generate.
+
+***
+
+We used an algorithm to generate the following tibbles containing the proportions of each demography stopped v. the proportion searched.
+
+```{r, include=TRUE, echo=FALSE}
+summarise(group_by(OTS_clean, search), total=n())
+#Of the full list of recorded stops, only 4681 resulted in searches. That's less than 4%.
+
+summarise(group_by(filter(OTS_clean, reason == "Vehicle Regulatory"), search), total=n())
+#Around 40% of total stops are for vehilce regulatory reasons - this explains why that seemed to be the most common reason for someone to get stopped. It would be useful to see these proportions for all of the reason types. 
+
+#Total stop & searches by reason:
+p_reason_search <- summarise(group_by(OTS_clean, search, reason), total=n()) %>% filter(search == "Yes")
+
+#Total stop without search by reason:
+p_reason_stop <- summarise(group_by(OTS_clean, search, reason), total=n()) %>% filter(search == "No")
+
+#Joining the two
+p_reason <- inner_join(p_reason_search, p_reason_stop, by="reason")
+p_reason <- select(ungroup(p_reason), reason, search = total.x, nosearch = total.y)
+
+#We want to look at the ratio of stops by reason that resulted in searches, so we'll add another column
+p_reason <- mutate(p_reason, ratstopsearch = search / (search + nosearch))
+
+#Would also be useful to know the proportion of all stops that each reason accounts for:
+totalstops <- nrow(OTS_clean)
+p_reason <- mutate(p_reason, pstoptotal = (search + nosearch) / totalstops)
+
+#Finally let's see the proportion of all stops that each reason accounts for:
+totalsearches <- nrow(filter(OTS_clean, search == "Yes"))
+p_reason <- mutate(p_reason, psearchtotal = search / totalsearches)
+p_reason
+write_csv(p_reason, "p_reason")
+
+#Division
+psearch <- summarise(group_by(OTS_clean, search, division), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, division), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="division")
+p <- select(ungroup(p), division, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_division <- p
+p_division
+write_csv(p_division, 'p_division')
+
+#Officer Race
+psearch <- summarise(group_by(OTS_clean, search, orace), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, orace), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="orace")
+p <- select(ungroup(p), orace, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_orace <- p
+p_orace
+write_csv(p_orace, 'p_orace')
+
+#Officer Gender
+psearch <- summarise(group_by(OTS_clean, search, ogender), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, ogender), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="ogender")
+p <- select(ungroup(p), ogender, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_ogender <- p
+p_ogender
+write_csv(p_ogender, 'p_ogender')
+
+#Driver Race
+psearch <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, drace), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="drace")
+p <- select(ungroup(p), drace, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_drace <- p
+p_drace
+write_csv(p_drace, 'p_drace')
+
+#Driver Ethnicity
+psearch <- summarise(group_by(OTS_clean, search, dethnicity), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, dethnicity), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="dethnicity")
+p <- select(ungroup(p), dethnicity, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_dethnicity <- p
+p_dethnicity
+write_csv(p_dethnicity, 'p_dethnicity')
+
+#Driver Gender
+psearch <- summarise(group_by(OTS_clean, search, dgender), total=n()) %>% filter(search == "Yes")
+pstop <- summarise(group_by(OTS_clean, search, dgender), total=n()) %>% filter(search == "No")
+p <- inner_join(psearch, pstop, by="dgender")
+p <- select(ungroup(p), dgender, search = total.x, nosearch = total.y)
+p <- mutate(p, ratstopsearch = search / (search + nosearch), pstoptotal = (search + nosearch) / totalstops, psearchtotal = search / totalsearches)
+p_dgender <- p
+p_dgender
+write_csv(p_dgender, 'p_dgender')
+```
+
+For example, around 40% of total stops are for vehicle regulatory reasons. This explains why that seemed to be the most common reasons for someone to get stopped.
+
+***
+
+We then divided it into variables to see if there was a relationship between certain variables and searches and stops. These variables are:
+
+-Division (location)
+	
+-Officer Race
+	
+-Officer Gender
+	
+-Driver Race
+	
+-Driver Ethnicity
+	
+-Driver Gender
+	
+With each variable, we calculated the amount that were stopped and the amount that were searched to calculate the proportions of each of the variables.
+
+***
+
+After calculating the proportions of each variable, we checked to see if they were significantly different than the Charlotte population proportions. If there is no difference between in the number of people who are searched and stopped based on their race, then they should reflect the proportions of race in the Charlotte population.
+
+***
+
+We performed a t-test on the difference between the proportion of the Charlotte population that's black and the proportion of stopped drivers that were. 
+	
+Since our p-value was very small, we found the difference to be significant. We decided to refine our final analysis to race only, and model search probability as a factor of driver age and race.

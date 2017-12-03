@@ -2,4 +2,7 @@
 title: "overview & our motivations"
 ---
 
-This page is currently in progress. Check back Friday!
+We chose this dataset for it's current relevancy. Police brutality and racial profiling is at the forefront of our collective political consciousness and we thought that analyzing this data would be a good way to find some kind of understanding of the issues. 
+
+As one of the major cities in North Carolina, the city of Charlotte provides the perfect sample for us to analyze. We found [this article](http://www.charlotteobserver.com/news/local/crime/article18289739.html) and thought that using traffic stop data from data.gov would be a good place to start.
+

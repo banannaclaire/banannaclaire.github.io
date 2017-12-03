@@ -17,12 +17,15 @@ navbar:
     - text: "analysis"
       icon: fa-area-chart
       href: analysis.html
+    - text: "results"
+      icon: fa-connectdevelop
+      href: about.html
     - text: "blog"
       icon: fa-quote-left
       href: results.html
-    - text: "presentation"
-      icon: fa-list-alt
-      href: slides.html
+      #text: "presentation"
+      #icon: fa-list-alt
+      #href: slides.html
 output:
   html_document:
     theme: yeti

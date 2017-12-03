@@ -2,4 +2,36 @@
 title: "our initial questions & ideas"
 ---
 
-This page is currently in progress. Check back Friday!
+**We started with the following questions:**
+
+-Is a certain race/sex/gender targeted by Charlotte Mecklenburg Police?
+
+-Do police in specific geographical areas carry out more traffic stops than other areas?
+
+-What race/sex/gender ends up with the worst result from the traffic stop?
+
+-Is there a relationship between the officer’s race and the driver’s race?
+
+***
+
+**The results of our EDA narrowed our scope:**
+
+What are the relationships between:  
+
+-Overall ratio of stops to searches
+
+-Most likely demographic groups to be searched
+
+-Most likely stop locations to result in a search
+
+-Relationship between gender of officer and gender of driver
+
+-Relationship between race of officer and race of driver 
+
+***
+
+**Additional food for thought:**
+
+-Is there actually a relationship between the race of the officer and the race of the driver? Or is it just random? 
+
+-Expanding the model to include the result of the search/stop; i.e. arrest, warning, etc.

@@ -198,17 +198,17 @@ $(document).ready(function () {
   </a>
 </li>
 <li>
+  <a href="about.html">
+    <span class="fa fa-connectdevelop"></span>
+     
+    results
+  </a>
+</li>
+<li>
   <a href="results.html">
     <span class="fa fa-quote-left"></span>
      
     blog
-  </a>
-</li>
-<li>
-  <a href="slides.html">
-    <span class="fa fa-list-alt"></span>
-     
-    presentation
   </a>
 </li>
       </ul>
@@ -228,7 +228,104 @@ $(document).ready(function () {
 </div>
 
 
-<p>This site is currently in progress. Check back Friday!</p>
+<p>We started by trying to visualize the relationships between different demographic variables and the categorical search variable</p>
+<p>-Location of search</p>
+<p>-Driver Race</p>
+<p>-Driver Gender</p>
+<p>-Officer Race</p>
+<p>-Officer Gender</p>
+<p>These plots didn’t tell us much. We needed to adjust for the proportion of total stops that certain categories generate.</p>
+<hr />
+<p>We used an algorithm to generate the following tibbles containing the proportions of each demography stopped v. the proportion searched.</p>
+<pre><code>## # A tibble: 2 x 2
+##   search  total
+##   &lt;fctr&gt;  &lt;int&gt;
+## 1     No 102943
+## 2    Yes   4681</code></pre>
+<pre><code>## # A tibble: 0 x 2
+## # ... with 2 variables: search &lt;fctr&gt;, total &lt;int&gt;</code></pre>
+<pre><code>## # A tibble: 10 x 6
+##                       reason search nosearch ratstopsearch  pstoptotal
+##                       &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+##  1 CheckPoint                    13      348    0.03601108 0.003354270
+##  2 Driving While Impaired        71       71    0.50000000 0.001319408
+##  3 Investigation                413     2063    0.16680129 0.023006021
+##  4 Other                        169     2309    0.06820016 0.023024604
+##  5 Safe Movement                276     6553    0.04041587 0.063452390
+##  6 SeatBelt                     105     1041    0.09162304 0.010648183
+##  7 Speeding                     389    27708    0.01384489 0.261066305
+##  8 Stop Light/Sign              360    10707    0.03252914 0.102830224
+##  9 Vehicle Equipment            826    11393    0.06759964 0.113534156
+## 10 Vehicle Regulatory          2059    40750    0.04809736 0.397764439
+## # ... with 1 more variables: psearchtotal &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 14 x 6
+##                    division search nosearch ratstopsearch pstoptotal
+##                      &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;
+##  1                              49     1459    0.03249337 0.01401174
+##  2         Central Division    214     4847    0.04228413 0.04702483
+##  3         Eastway Division    415    10687    0.03738065 0.10315543
+##  4         Freedom Division    336     4771    0.06579205 0.04745224
+##  5   Hickory Grove Division    525     8703    0.05689207 0.08574296
+##  6    Independence Division    326     6290    0.04927449 0.06147328
+##  7           Metro Division    580     4383    0.11686480 0.04611425
+##  8           North Division    187     8793    0.02082405 0.08343864
+##  9     North Tryon Division    631     7762    0.07518170 0.07798446
+## 10      Providence Division    225    12377    0.01785431 0.11709284
+## 11           South Division    129    11232    0.01135463 0.10556196
+## 12    Steele Creek Division    314     7163    0.04199545 0.06947335
+## 13 University City Division    198     6551    0.02933768 0.06270906
+## 14        Westover Division    552     7925    0.06511738 0.07876496
+## # ... with 1 more variables: psearchtotal &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 9 x 6
+##                            orace search nosearch ratstopsearch
+##                           &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;
+## 1                                    18      422    0.04090909
+## 2                      2 or More      1      104    0.00952381
+## 3  American Indian/Alaska Native     14      280    0.04761905
+## 4       Asian / Pacific Islander    159     6094    0.02542779
+## 5         Black/African American    436    17708    0.02402998
+## 6                Hispanic/Latino    210     4519    0.04440685
+## 7 Native Hawaiian/Oth Pac Island      4       98    0.03921569
+## 8                  Not Specified     51      462    0.09941520
+## 9                          White   3788    73256    0.04916671
+## # ... with 2 more variables: pstoptotal &lt;dbl&gt;, psearchtotal &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 2 x 6
+##   ogender search nosearch ratstopsearch pstoptotal psearchtotal
+##    &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1  Female    288     8996    0.03102111 0.08626329   0.06152532
+## 2    Male   4393    93947    0.04467155 0.91373671   0.93847468</code></pre>
+<pre><code>## # A tibble: 4 x 6
+##           drace search nosearch ratstopsearch pstoptotal psearchtotal
+##          &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1         Asian     29     1900    0.01503370 0.01792351  0.006195257
+## 2         Black   3667    56010    0.06144746 0.55449528  0.783379620
+## 3 Other/Unknown     38     3247    0.01156773 0.03052293  0.008117924
+## 4         White    947    41704    0.02220347 0.39629637  0.202307199</code></pre>
+<pre><code>## # A tibble: 2 x 6
+##     dethnicity search nosearch ratstopsearch pstoptotal psearchtotal
+##         &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1     Hispanic    408    10398    0.03775680  0.1004051   0.08716086
+## 2 Non-Hispanic   4273    92545    0.04413436  0.8995949   0.91283914</code></pre>
+<pre><code>## # A tibble: 2 x 6
+##   dgender search nosearch ratstopsearch pstoptotal psearchtotal
+##    &lt;fctr&gt;  &lt;int&gt;    &lt;int&gt;         &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1  Female    780    43679    0.01754425  0.4130956    0.1666311
+## 2    Male   3901    59264    0.06175889  0.5869044    0.8333689</code></pre>
+<p>For example, around 40% of total stops are for vehicle regulatory reasons. This explains why that seemed to be the most common reasons for someone to get stopped.</p>
+<hr />
+<p>We then divided it into variables to see if there was a relationship between certain variables and searches and stops. These variables are:</p>
+<p>-Division (location)</p>
+<p>-Officer Race</p>
+<p>-Officer Gender</p>
+<p>-Driver Race</p>
+<p>-Driver Ethnicity</p>
+<p>-Driver Gender</p>
+<p>With each variable, we calculated the amount that were stopped and the amount that were searched to calculate the proportions of each of the variables.</p>
+<hr />
+<p>After calculating the proportions of each variable, we checked to see if they were significantly different than the Charlotte population proportions. If there is no difference between in the number of people who are searched and stopped based on their race, then they should reflect the proportions of race in the Charlotte population.</p>
+<hr />
+<p>We performed a t-test on the difference between the proportion of the Charlotte population that’s black and the proportion of stopped drivers that were.</p>
+<p>Since our p-value was very small, we found the difference to be significant. We decided to refine our final analysis to race only, and model search probability as a factor of driver age and race.</p>
 
 
 
